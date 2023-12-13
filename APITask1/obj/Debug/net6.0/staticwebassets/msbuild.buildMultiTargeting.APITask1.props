@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\APITask1.props" />
+</Project>
