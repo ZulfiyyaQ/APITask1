@@ -1,5 +1,4 @@
-﻿using APITask1.DAL;
-using APITask1.Entities;
+﻿
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +18,7 @@ namespace APITask1.Controllers
         [HttpGet]
         public async Task<IActionResult> Get(int page, int take)
         {
-            List<Tag> tags = await _context.Tags.Skip((page - 1) * take).Take(take).ToListAsync();
+            List<Tag> tags = await _context.Tags.AsNoTracking().Skip((page - 1) * take).Take(take).ToListAsync();
             return Ok(tags);
         }
 
@@ -36,8 +35,12 @@ namespace APITask1.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create(Tag tag)
+        public async Task<IActionResult> Create([FromForm] CreateTagDTO tagdto)
         {
+            Tag tag = new Tag
+            {
+                Name=tagdto.Name
+            };
             await _context.Tags.AddAsync(tag);
             await _context.SaveChangesAsync();
             return StatusCode(StatusCodes.Status201Created, tag);
@@ -70,7 +73,7 @@ namespace APITask1.Controllers
         {
             if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest);
 
-            Tag existed = await _context.Tags.FirstOrDefaultAsync(x => x.Id == id);
+            Tag existed = await _context.Tags.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id);
 
             if (existed is null) return StatusCode(StatusCodes.Status404NotFound);
 
