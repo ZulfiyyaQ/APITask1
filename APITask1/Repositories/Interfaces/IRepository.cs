@@ -2,15 +2,21 @@
 
 namespace APITask1.Repositories.Interfaces
 {
-    public interface IRepository
+    public interface IRepository<T> where T:BaseEntity,new()
     {
-        Task<IQueryable<Category>> GetAllAsync(Expression<Func<Category,bool>>? expression=null,params string[] include);
-        Task<Category> GetByIdAsync(int id);
+        Task<IQueryable<T>> GetAllAsync(Expression<Func<T, bool>>? expression=null,
+            Expression<Func<T,object>>? orderExpression=null,
+             bool isDescenting = false,
+             int skip=0,
+             int take=0,
+             bool isTracking=true,
+            params string[] include);
+        Task<T> GetByIdAsync(int id);
 
-        Task AddAsync(Category category);
-        void Update(Category category);
+        Task AddAsync(T entity);
+        void Update(T entity);
 
-        void Delete(Category category);
+        void Delete(T entity);
         Task SaveChangesAsync();
 
     }

@@ -10,9 +10,9 @@ namespace APITask1.Controllers
     public class CategoriesController : ControllerBase
     {
         
-        private readonly IRepository _repository;
+        private readonly ICategoryRepository _repository;
 
-        public CategoriesController(IRepository repository)
+        public CategoriesController(ICategoryRepository repository)
         {
            
             _repository = repository;
@@ -21,7 +21,7 @@ namespace APITask1.Controllers
         [HttpGet]
         public async Task<IActionResult> Get(int page, int take)
         {
-            IEnumerable<Category> categories = await _repository.GetAllAsync();
+            IEnumerable<Category> categories = await _repository.GetAllAsync(orderExpression:c=>c.Name,isDescenting:true,skip:(page-1)*take,take:take);
             //List<Category> categories = await _context.Categories.AsNoTracking().Skip((page - 1) * take).Take(take).ToListAsync();
             return Ok(categories);
         }
