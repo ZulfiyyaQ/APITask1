@@ -1,5 +1,6 @@
 using APITask1.DAL;
 using APITask1.Repositories.Implementations;
+using APITask1.Services.Implementations;
 using Microsoft.EntityFrameworkCore;
 
 namespace APITask1
@@ -20,6 +21,9 @@ namespace APITask1
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Services.AddScoped<ICategoryRepository,CategoryRepository>();
+            builder.Services.AddScoped<ICategoryService, CategoryService>();
+            builder.Services.AddScoped<ITagRepository, TagRepository>();
+            builder.Services.AddScoped<ITagService, TagService>();
 
             var app = builder.Build();
 

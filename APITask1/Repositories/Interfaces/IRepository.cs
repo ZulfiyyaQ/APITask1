@@ -4,7 +4,7 @@ namespace APITask1.Repositories.Interfaces
 {
     public interface IRepository<T> where T:BaseEntity,new()
     {
-        Task<IQueryable<T>> GetAllAsync(Expression<Func<T, bool>>? expression=null,
+        IQueryable<T> GetAllAsync(Expression<Func<T, bool>>? expression=null,
             Expression<Func<T,object>>? orderExpression=null,
              bool isDescenting = false,
              int skip=0,

@@ -1,4 +1,5 @@
 ﻿
+using APITask1.DTOs.Category;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -9,81 +10,47 @@ namespace APITask1.Controllers
     [ApiController]
     public class CategoriesController : ControllerBase
     {
-        
-        private readonly ICategoryRepository _repository;
 
-        public CategoriesController(ICategoryRepository repository)
+        private readonly ICategoryService _service;
+
+        public CategoriesController(ICategoryService service)
         {
-           
-            _repository = repository;
+            _service = service;
         }
 
         [HttpGet]
         public async Task<IActionResult> Get(int page, int take)
         {
-            IEnumerable<Category> categories = await _repository.GetAllAsync(orderExpression:c=>c.Name,isDescenting:true,skip:(page-1)*take,take:take);
-            //List<Category> categories = await _context.Categories.AsNoTracking().Skip((page - 1) * take).Take(take).ToListAsync();
-            return Ok(categories);
+            return Ok(await _service.GetAllAsync(page, take));
         }
 
-        [HttpGet("{id}")] 
+        [HttpGet("{id}")]
         public async Task<IActionResult> Get(int id)
         {
             if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest);
-
-            Category category = await _repository.GetByIdAsync(id);
-
-            if (category is null) return StatusCode(StatusCodes.Status404NotFound);
-
-            return StatusCode(StatusCodes.Status200OK, category);
+            return StatusCode(StatusCodes.Status200OK, await _service.GetByIdAsync(id));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] CreateCategoryDTO categorydto)
+        public async Task<IActionResult> Create([FromForm] CreateCategoryDTO createCategoryDto)
         {
-            Category category = new Category
-            {
-                Name=categorydto.Name
-            };
-            await _repository.AddAsync(category);
-            await _repository.SaveChangesAsync();
-            return StatusCode(StatusCodes.Status201Created, category);
+            await _service.CreateAsync(createCategoryDto);
+            return StatusCode(StatusCodes.Status201Created);
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, string name)
+        public async Task<IActionResult> Update(int id, [FromForm] UpdateCategoryDto updateCategoryDto)
         {
-            if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest);
-
-            Category existed = await _repository.GetByIdAsync(id) ;
-
-            if (existed is null) return StatusCode(StatusCodes.Status404NotFound);
-
-            //bool result = _context.Categories.Any(t => t.Name.ToLower().Trim() == name.ToLower().Trim());
-            //if (result)
-            //{
-            //    return StatusCode(StatusCodes.Status409Conflict);
-            //}
-
-            existed.Name = name;
-            _repository.Update(existed);
-            await _repository.SaveChangesAsync();
+            if (id <= 0) return BadRequest();
+            await _service.UpdateAsync(id, updateCategoryDto);
             return NoContent();
-
-
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {
-            if (id <= 0) return StatusCode(StatusCodes.Status400BadRequest);
-
-            Category existed = await _repository.GetByIdAsync(id);
-
-            if (existed is null) return StatusCode(StatusCodes.Status404NotFound);
-
-            _repository.Delete(existed);
-            await _repository.SaveChangesAsync();
+            if (id <= 0) return BadRequest();
+            await _service.DeleteAsync(id);
             return NoContent();
         }
     }

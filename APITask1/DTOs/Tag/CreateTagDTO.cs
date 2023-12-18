@@ -1,4 +1,4 @@
-﻿namespace APITask1.DTOs
+﻿namespace APITask1.DTOs.Tag
 {
     public class CreateTagDTO
     {
